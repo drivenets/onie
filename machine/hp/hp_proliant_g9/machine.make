@@ -8,7 +8,7 @@
 
 ONIE_ARCH ?= x86_64
 
-VENDOR_REV ?= 0
+VENDOR_VERSION = v06
 
 # Translate hardware revision to ONIE hardware revision
 ifeq ($(VENDOR_REV),0)
