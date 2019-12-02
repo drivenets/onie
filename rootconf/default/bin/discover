@@ -163,7 +163,7 @@ service_discovery()
     # add/update $onie_disco
     log_console_msg "Starting ONIE Service Discovery"
     onie_disco=
-    sd_static  && return
+    sd_static
     sd_localfs
     sd_dhcp6
     sd_dhcp4
