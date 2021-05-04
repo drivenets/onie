@@ -47,7 +47,7 @@ CONSOLE_DEV = 0
 # LINUX_MINOR_VERSION = 38
 
 # Older GCC required for older 3.2 kernel
-GCC_VERSION = 4.9.2
+# GCC_VERSION = 4.9.2
 
 #-------------------------------------------------------------------------------
 #
