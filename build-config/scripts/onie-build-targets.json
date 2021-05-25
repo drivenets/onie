@@ -65,7 +65,7 @@
     { "Vendor": "accton", "Platform": "accton_asxvolt16",        "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "accton", "Platform": "accton_bacon",            "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "accton", "Platform": "accton_csp9250",          "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
-    { "Vendor": "accton", "Platform": "accton_ebof",             "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },	
+    { "Vendor": "accton", "Platform": "accton_ebof",             "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "accton", "Platform": "accton_minipack",         "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "accton", "Platform": "accton_p9532x",           "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "accton", "Platform": "accton_p9572x",           "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
@@ -153,8 +153,8 @@
     { "Vendor": "delta", "Platform": "delta_common_bwde", "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "delta", "Platform": "delta_common_dnv",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "delta", "Platform": "delta_et-6248brb",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
-    { "Vendor": "delta", "Platform": "delta_tn48m",       "BuildEnv": "Debian9", "Release": "2020.08br", "Architecture": "AArch64", "Notes": "No notes." },
-    { "Vendor": "delta", "Platform": "delta_tx4810",      "BuildEnv": "Debian9", "Release": "2020.11br", "Architecture": "AArch64", "Notes": "No notes." },		
+    { "Vendor": "delta", "Platform": "delta_tn48m",       "BuildEnv": "Debian9", "Release": "2021.02br", "Architecture": "AArch64", "Notes": "No notes." },
+    { "Vendor": "delta", "Platform": "delta_tx4810",      "BuildEnv": "Debian9", "Release": "2021.02br", "Architecture": "AArch64", "Notes": "No notes." },
     { "Vendor": "delta", "Platform": "delta_wb2448",      "BuildEnv": "Debian9", "Release": "None",      "Architecture": "amd64",   "Notes": "Compile error." },
 
     { "Vendor": "dni", "Platform": "dni_3048up",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
@@ -177,6 +177,7 @@
     { "Vendor": "inventec", "Platform": "inventec_d6254qs",     "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "inventec", "Platform": "inventec_d6356",       "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "inventec", "Platform": "inventec_d7054q28b",   "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "inventec", "Platform": "inventec_d7332",       "BuildEnv": "Debian9", "Release": "2021.02br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "inventec", "Platform": "inventec_dcs7032q28",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "inventec", "Platform": "inventec_dcs7032q28b", "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
 
@@ -203,6 +204,7 @@
     { "Vendor": "netberg", "Platform": "netberg_aurora_710",      "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "netberg", "Platform": "netberg_aurora_740",      "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "netberg", "Platform": "netberg_aurora_750",      "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "netberg", "Platform": "netberg_aurora_820",      "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },	
     { "Vendor": "netberg", "Platform": "netberg_rangeley_p1330",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
 
     { "Vendor": "nxp", "Platform": "nxp_ls1043ardb",    "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
@@ -213,9 +215,9 @@
     { "Vendor": "nxp", "Platform": "nxp_p2041rdb",      "BuildEnv": "Debian9", "Release": "None",      "Architecture": "PowerPC",   "Notes": "Compile error" },
     { "Vendor": "nxp", "Platform": "nxp_t2080rdb",      "BuildEnv": "Debian9", "Release": "None",      "Architecture": "PowerPC",   "Notes": "Compile error" },
 
-    { "Vendor": "pegatron", "Platform": "pegatron_common_bde",   "BuildEnv": "Debian9", "Release": "2020.08br", "Architecture": "amd64",   "Notes": "No notes." },
-    { "Vendor": "pegatron", "Platform": "pegatron_common_rgl",   "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
-    { "Vendor": "pegatron", "Platform": "pegatron_fn_6254_dn_f", "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "pegatron", "Platform": "pegatron_common_bde",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "pegatron", "Platform": "pegatron_common_rgl",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "pegatron", "Platform": "pegatron_fn_6254_dn_f", "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
 
     { "Vendor": "plexxi", "Platform": "px_switch2",  "BuildEnv": "Debian9", "Release": "None", "Architecture": "amd64",   "Notes": "Build automation failure." },
 
@@ -232,13 +234,30 @@
     { "Vendor": "quanta", "Platform": "quanta_ly3",              "BuildEnv": "Debian9", "Release": "None",      "Architecture": "PowerPC", "Notes": "Image size exceeds maximum." },
     { "Vendor": "quanta", "Platform": "quanta_ly4r",             "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
 
+    { "Vendor": "silicom", "Platform": "silicom_madrid",         "BuildEnv": "Debian9", "Release": "2021.02br", "Architecture": "amd64",   "Notes": "No notes." },
+
     { "Vendor": "stordis", "Platform": "stordis_bf2556x_1t",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
     { "Vendor": "stordis", "Platform": "stordis_bf6064x_t",   "BuildEnv": "Debian9", "Release": "None",      "Architecture": "amd64",   "Notes": "Compile error." },
 
-    { "Vendor": "ufispace", "Platform": "ufispace_s9500_30xs", "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
-    { "Vendor": "ufispace", "Platform": "ufispace_s9700_23d",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
-    { "Vendor": "ufispace", "Platform": "ufispace_s9700_53dx", "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
-    { "Vendor": "ufispace", "Platform": "ufispace_s9705_48d",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9300_32d",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9500_22xst", "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9500_30xs",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9501_16smt", "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9501_18smt", "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9501_28smt", "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9510_28dc",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9510_30xc",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9600_32x",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9600_48x",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9600_64x",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9600_72xc",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9700_23d",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9700_53dx",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9700_53dx",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9701_78dc",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9701_82dc",  "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9705_48d",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
+    { "Vendor": "ufispace", "Platform": "ufispace_s9710_76d",   "BuildEnv": "Debian9", "Release": "2021.05br", "Architecture": "amd64",   "Notes": "No notes." },
 
     { "Vendor": "wiwynn", "Platform": "wiwynn_andromeda",  "BuildEnv": "Debian9", "Release": "2020.05br", "Architecture": "amd64",   "Notes": "No notes." },
 

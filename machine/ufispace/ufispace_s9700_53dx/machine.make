@@ -18,7 +18,7 @@ endif
 # string.  HW vendors can use this to appended their own versioning
 # information to the base ONIE version string.
 # ONIE Version = onie-release version + VENDOR_VERSION
-VENDOR_VERSION = v09
+VENDOR_VERSION = v10
 
 # Enable UEFI support
 UEFI_ENABLE = yes
