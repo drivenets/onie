@@ -57,7 +57,7 @@ FIRMWARE_UPDATE_ENABLE = yes
 SKIP_ETHMGMT_MACS = yes
 
 # Enable building of secure boot binaries
-SECURE_BOOT_ENABLE = yes
+# SECURE_BOOT_ENABLE = yes
 
 # ONIE_VENDOR_SECRET_KEY_PEM -- file system path to private RSA key
 # encoded in PEM format.

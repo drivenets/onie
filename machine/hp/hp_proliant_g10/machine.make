@@ -56,9 +56,6 @@ FIRMWARE_UPDATE_ENABLE = yes
 # Do not modify Ethernet management MACs programmed by hypervisor.
 SKIP_ETHMGMT_MACS = yes
 
-# Enable building of secure boot binaries
-SECURE_BOOT_ENABLE = yes
-
 # SERIAL_CONSOLE_ENABLE = no
 
 # ONIE_VENDOR_SECRET_KEY_PEM -- file system path to private RSA key
@@ -95,8 +92,8 @@ ONIE_VENDOR_CERT_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.pem
 # to simulate having shimx64.efi signed by a recognized signing
 # authority.  The certificate used here must be loaded into the DB on
 # the target system in order to verify the signature.
-SHIM_SELF_SIGN_SECRET_KEY_PEM  = $(MACHINEDIR)/x509/sw-vendor-DB-secret-key.pem
-SHIM_SELF_SIGN_PUBLIC_CERT_PEM = $(MACHINEDIR)/x509/sw-vendor-DB-cert.pem
+# SHIM_SELF_SIGN_SECRET_KEY_PEM  = $(MACHINEDIR)/x509/sw-vendor-DB-secret-key.pem
+# SHIM_SELF_SIGN_PUBLIC_CERT_PEM = $(MACHINEDIR)/x509/sw-vendor-DB-cert.pem
 
 # Console parameters can be defined here (default values are in
 # build-config/arch/x86_64.make).

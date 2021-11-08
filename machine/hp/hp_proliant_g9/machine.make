@@ -56,9 +56,6 @@ FIRMWARE_UPDATE_ENABLE = yes
 # Do not modify Ethernet management MACs programmed by hypervisor.
 SKIP_ETHMGMT_MACS = yes
 
-# Enable building of secure boot binaries
-SECURE_BOOT_ENABLE = yes
-
 # ONIE_VENDOR_SECRET_KEY_PEM -- file system path to private RSA key
 # encoded in PEM format.
 #
@@ -70,7 +67,7 @@ SECURE_BOOT_ENABLE = yes
 # In this example, the machine is a demonstration vehicle and the
 # secret key is not sensitive.  It is reasonable for this key to
 # reside in the upstream code repository.
-ONIE_VENDOR_SECRET_KEY_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-secret-key.pem
+# ONIE_VENDOR_SECRET_KEY_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-secret-key.pem
 
 # ONIE_VENDOR_CERT_DER -- file system path to public vendor x509
 # certificate, encoded in DER format.
@@ -79,12 +76,12 @@ ONIE_VENDOR_SECRET_KEY_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-secret-key.pem
 # not expect the certificate to reside in the upstream code
 # repository.  Included here as this machine is a demonstration
 # vehicle.
-ONIE_VENDOR_CERT_DER = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.der
+# ONIE_VENDOR_CERT_DER = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.der
 
 # ONIE_VENDOR_CERT_PEM -- file system path to public vendor x509
 # certificate, encoded in PEM format.  Same as ONIE_VENDOR_CERT_DER,
 # but in PEM format.
-ONIE_VENDOR_CERT_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.pem
+# ONIE_VENDOR_CERT_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.pem
 
 # SHIM_SELF_SIGN_SECRET_KEY_PEM
 # SHIM_SELF_SIGN_PUBLIC_CERT_PEM
@@ -93,8 +90,8 @@ ONIE_VENDOR_CERT_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.pem
 # to simulate having shimx64.efi signed by a recognized signing
 # authority.  The certificate used here must be loaded into the DB on
 # the target system in order to verify the signature.
-SHIM_SELF_SIGN_SECRET_KEY_PEM  = $(MACHINEDIR)/x509/sw-vendor-DB-secret-key.pem
-SHIM_SELF_SIGN_PUBLIC_CERT_PEM = $(MACHINEDIR)/x509/sw-vendor-DB-cert.pem
+# SHIM_SELF_SIGN_SECRET_KEY_PEM  = $(MACHINEDIR)/x509/sw-vendor-DB-secret-key.pem
+# SHIM_SELF_SIGN_PUBLIC_CERT_PEM = $(MACHINEDIR)/x509/sw-vendor-DB-cert.pem
 
 # Console parameters can be defined here (default values are in
 # build-config/arch/x86_64.make).
