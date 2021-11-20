@@ -40,5 +40,7 @@
 # Local Variables:
 # mode: makefile-gmake
 # End:
-IPMITOOL_ENABLE = yes
+
 OPENSSL_ENABLE = yes
+IPMITOOL_ENABLE = yes
+PACKAGES_INSTALL_STAMPS += $(CURL_INSTALL_STAMP)
