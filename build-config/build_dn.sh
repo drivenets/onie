@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export http_proxy=http://proxy.dev.drivenets.net:3128
+
 cpu_count=22
 
 make -j${cpu_count} MACHINE=kvm_x86_64 clean
