@@ -13,7 +13,7 @@
 
 echo -n "Updating HP Firmwares "
 ./update_firmware.sh || {
-    echo "ERROR: Problems updating the BIOS"
+    echo "ERROR: Problems running firmware package"
     exit 1
 }
 echo " done."

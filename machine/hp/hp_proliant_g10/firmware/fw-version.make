@@ -4,7 +4,4 @@
 # SPDX-License-Identifier:     GPL-2.0
 #
 
-# Demonstration of firmware version
-
-# The firmware version is a free form string
-FW_VERSION	= DEMO-FW-1.2.3.4
+FW_VERSION	= FW-WRAPPER-1.0
