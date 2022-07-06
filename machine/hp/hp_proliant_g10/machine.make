@@ -125,3 +125,5 @@ RECOVERY_DEFAULT_ENTRY = embed
 # End:
 
 IPMITOOL_ENABLE = yes
+# Enable building of secure boot binaries
+SECURE_BOOT_ENABLE = yes
