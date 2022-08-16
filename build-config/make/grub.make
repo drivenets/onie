@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 #
+#  Copyright (C) 2020,2021 Alex Doyle <adoyle@nvidia.com>
+#  Copyright (C) 2021 Andriy Dobush <andriyd@nvidia.com>
 #  Copyright (C) 2014,2015,2017 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2015,2017 david_yang <david_yang@accton.com>
 #  Copyright (C) 2016 Pankaj Bansal <pankajbansal3073@gmail.com>
@@ -11,7 +13,7 @@
 # This is a makefile fragment that defines the build of grub
 #
 
-GRUB_VERSION		= 2.02
+GRUB_VERSION		= 2.04
 GRUB_TARBALL		= grub-$(GRUB_VERSION).tar.xz
 GRUB_TARBALL_URLS	+= $(ONIE_MIRROR) http://git.savannah.gnu.org/cgit/grub.git/snapshot/ ftp://alpha.gnu.org/gnu/grub/
 GRUB_BUILD_DIR		= $(USER_BUILDDIR)/grub
@@ -97,7 +99,7 @@ GRUB_COMMON_CONFIG = 			\
 
 PHONY += grub grub-download grub-source grub-patch \
 	 grub-configure grub-build grub-install \
-	 grub-clean grub-download-clean
+	 grub-clean grub-download-clean grub-i386-clean
 
 GRUB_SBIN = grub-install grub-bios-setup grub-probe grub-reboot grub-set-default
 GRUB_BIN = grub-mkrelpath grub-mkimage grub-editenv
@@ -207,7 +209,7 @@ $(GRUB_BUILD_STAMP): $(GRUB_BUILD_I386_STAMP) $(GRUB_BUILD_UEFI_STAMP) $(GRUB_BU
 	$(Q) touch $@
 
 # $(1) -- the type of grub binary
-# $(2) -- the build grub install direcoty
+# $(2) -- the build grub install directory
 # $(3) -- the destination systroot directory
 define grub_install
 	$(Q) echo "==== Installing $(1) in $(3) ===="
@@ -249,7 +251,15 @@ grub-clean:
 
 DOWNLOAD_CLEAN += grub-download-clean
 grub-download-clean:
-	$(Q) rm -f $(GRUB_DOWNLOAD_STAMP) $(DOWNLOADDIR)/grub*
+	$(Q) echo "====  Deleting all $(GRUB_VERSION) files. ===="
+	$(Q) rm -rf $(GRUB_BUILD_DIR)
+	$(Q) rm -f $(GRUB_DOWNLOAD_STAMP) $(DOWNLOADDIR)/grub* $(GRUB_PATCH_STAMP) $(GRUB_SOURCE_STAMP) $(GRUB_PATCH_STAMP)
+
+# Remove stamps and i386 build area so GRUB will re-create it from grub-$(GRUB_VERSION)
+# Ex: make grub-i386-clean ; make grub
+grub-i386-clean:
+	$(Q) rm -rf $(GRUB_CONFIGURE_I386_STAMP) $(GRUB_BUILD_I386_STAMP) $(GRUB_INSTALL_I386_STAMP) $(GRUB_CONFIGURE_I386_COREBOOT_STAMP)  $(GRUB_BUILD_I386_COREBOOT_STAMP) $(GRUB_INSTALL_I386_COREBOOT_STAMP)
+	$(Q) rm -rf $(GRUB_I386_DIR)
 
 # ---------------------------------------------------------------------------
 # grub-host build rules
@@ -364,12 +374,15 @@ grub-host-clean:
 grub-install-sb: $(GRUB_INSTALL_SB_STAMP)
 $(GRUB_INSTALL_SB_STAMP): $(SBSIGNTOOL_INSTALL_STAMP) $(GRUB_INSTALL_STAMP) $(GRUB_HOST_INSTALL_STAMP)
 	$(Q) echo "====  Building grub-$(ARCH)-efi-$(GRUB_VERSION) monolithic secure boot image ===="
-	$(Q) rm -rf $(SYSROOTDIR)/usr/lib/grub/$(ARCH)-efi
+# Grub generates detached signatures 
 	$(Q) $(SCRIPTDIR)/mk-grub-efi-image $(ARCH) $(GRUB_HOST_BIN_UEFI_DIR) \
-		$(GRUB_TARGET_LIB_UEFI_DIR) $(GRUB_MONOLITH_IMAGE)
-	$(Q) sbsign --key $(ONIE_VENDOR_SECRET_KEY_PEM) \
-		--cert $(ONIE_VENDOR_CERT_PEM) \
-		--output $(GRUB_SECURE_BOOT_IMAGE) $(GRUB_MONOLITH_IMAGE)
+		$(GRUB_TARGET_LIB_UEFI_DIR) $(GRUB_MONOLITH_IMAGE) \
+		$(SECURE_GRUB) \
+		$(GPG_SIGN_PUBRING) $(GRUB_USER) $(GRUB_PASSWD_PLAINTEXT) $(GRUB_PASSWD_HASHED)
+	$(Q) echo "=== Secure Boot: Signing grub efi binaries "
+	$(Q) $(SCRIPTDIR)/efi-sign.sh $(ONIE_VENDOR_SECRET_KEY_PEM) \
+		$(ONIE_VENDOR_CERT_PEM) $(GRUB_MONOLITH_IMAGE) $(GRUB_SECURE_BOOT_IMAGE)
+	$(Q) echo "== Signed output grub from $(GRUB_MONOLITH_IMAGE) is at $(GRUB_SECURE_BOOT_IMAGE)"
 	$(Q) touch $@
 
 #-------------------------------------------------------------------------------

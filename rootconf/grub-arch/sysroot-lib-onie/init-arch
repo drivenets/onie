@@ -1,5 +1,6 @@
 # Early boot time initializations for x86_64 architectures
 
+#  Copyright (C) 2021 Alex Doyle <adoyle@nvidia.com>
 #  Copyright (C) 2014 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2014,2018 david_yang <david_yang@accton.com>
 #
@@ -114,11 +115,19 @@ EOF
 init_uefi
 
 if [ -d /sys/firmware/efi/efivars ] ; then
+    # Only UEFI systems will support Secure Boot
+    if [ -e /sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c ]; then
+        if [ "$(efivar -d -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-SecureBoot)" -eq 1 ]; then
+            echo "Info: Secure Boot: Active."
+        else
+            echo "Info: Secure Boot: Disabled."
+        fi
+    fi
     bios_mode="UEFI"
 else
     bios_mode="legacy"
 fi
-echo "Info: BIOS mode: $bios_mode"
+echo "Info: BIOS mode:   $bios_mode"
 
 # Local Variables:
 # mode: shell-script

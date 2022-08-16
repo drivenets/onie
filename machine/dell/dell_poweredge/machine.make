@@ -1,5 +1,6 @@
 # KVM x86_64 Virtual Machine
 
+#  Copyright (C) 2021 Alex Doyle <adoyle@nvidia.com>
 #  Copyright (C) 2014,2016,2017,2018 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2014 david_yang <david_yang@accton.com>
 #  Copyright (C) 2014 Stephen Su <sustephen@juniper.net>
@@ -22,7 +23,7 @@ endif
 # in the ONIE waterfall.  This string should be the stock ticker
 # symbol of the ASIC vendor, in lower case.  The value in this example
 # here is completely fictitious.
-SWITCH_ASIC_VENDOR = dell
+SWITCH_ASIC_VENDOR = none
 
 # The VENDOR_VERSION string is appended to the overal ONIE version
 # string.  HW vendors can use this to appended their own versioning
@@ -32,7 +33,7 @@ SWITCH_ASIC_VENDOR = dell
 # Vendor ID -- IANA Private Enterprise Number:
 # http://www.iana.org/assignments/enterprise-numbers
 # Open Compute Project IANA number
-VENDOR_ID = 674
+VENDOR_ID = 42623
 
 # Skip the i2ctools and the onie-syseeprom command for this platform
 I2CTOOLS_ENABLE = no
@@ -57,44 +58,25 @@ FIRMWARE_UPDATE_ENABLE = yes
 SKIP_ETHMGMT_MACS = yes
 
 # Enable building of secure boot binaries
+# NOTE that disabling Secure Boot will require
+#  editing the kernel/config file for kvm_x86_64
+#  as it defaults to expecting the paths and keys
+#  that this provides.
+# The kernel/config-insecure file is provided as
+#  an example.
 SECURE_BOOT_ENABLE = yes
 
-# ONIE_VENDOR_SECRET_KEY_PEM -- file system path to private RSA key
-# encoded in PEM format.
-#
-# WARNING: This key is extremely sensitive and should be handled
-# carefully.  In practice, this key should never be checked into the
-# code repository.  Set ONIE_VENDOR_SECRET_KEY_PEM on the make command
-# line at build time.
-#
-# In this example, the machine is a demonstration vehicle and the
-# secret key is not sensitive.  It is reasonable for this key to
-# reside in the upstream code repository.
-ONIE_VENDOR_SECRET_KEY_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-secret-key.pem
+# Enable extended secure boot:
+#  Activates - ONIE password
+SECURE_BOOT_EXT = yes
 
-# ONIE_VENDOR_CERT_DER -- file system path to public vendor x509
-# certificate, encoded in DER format.
-#
-# Typically this variable is specified on the command line as we do
-# not expect the certificate to reside in the upstream code
-# repository.  Included here as this machine is a demonstration
-# vehicle.
-ONIE_VENDOR_CERT_DER = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.der
+# Enable GRUB verification of files and passwords
+# Requires secure boot
+SECURE_GRUB = yes
 
-# ONIE_VENDOR_CERT_PEM -- file system path to public vendor x509
-# certificate, encoded in PEM format.  Same as ONIE_VENDOR_CERT_DER,
-# but in PEM format.
-ONIE_VENDOR_CERT_PEM = $(MACHINEDIR)/x509/onie-vendor-SHIM-cert.pem
-
-# SHIM_SELF_SIGN_SECRET_KEY_PEM
-# SHIM_SELF_SIGN_PUBLIC_CERT_PEM
-#
-# These two parameters are for testing purposes only.  They allow one
-# to simulate having shimx64.efi signed by a recognized signing
-# authority.  The certificate used here must be loaded into the DB on
-# the target system in order to verify the signature.
-SHIM_SELF_SIGN_SECRET_KEY_PEM  = $(MACHINEDIR)/x509/sw-vendor-DB-secret-key.pem
-SHIM_SELF_SIGN_PUBLIC_CERT_PEM = $(MACHINEDIR)/x509/sw-vendor-DB-cert.pem
+# Define the makefile with security settings, to
+# provide the option of using another file with different settings.
+# MACHINE_SECURITY_MAKEFILE ?= $(MACHINEDIR)/machine-security.make
 
 # Console parameters can be defined here (default values are in
 # build-config/arch/x86_64.make).
@@ -117,12 +99,30 @@ RECOVERY_DEFAULT_ENTRY = embed
 
 # Include additional files in the installer image.  This is useful to
 # share code between the ONIE run-time and the installer.
-# UPDATER_IMAGE_PARTS_PLATFORM = $(MACHINEDIR)/rootconf/sysroot-lib-onie/test-install-sharing
+UPDATER_IMAGE_PARTS_PLATFORM = $(MACHINEDIR)/rootconf/sysroot-lib-onie/test-install-sharing
+
+# Secure GRUB requires Secure Boot extensions
+ifeq ($(SECURE_GRUB),yes)
+	SECURE_BOOT_EXT = yes
+endif
+
+# Secure boot extended requires secure boot to be active.
+# This will enable onie/grub passwords, detached signatures, etc
+ifeq ($(SECURE_BOOT_EXT),yes)
+	SECURE_BOOT_ENABLE = yes
+endif
+
+
+
 
 #-------------------------------------------------------------------------------
 #
 # Local Variables:
 # mode: makefile-gmake
 # End:
+#
+SECURE_BOOT_ENABLE = no
+SECURE_BOOT_EXT = no
+SECURE_GRUB = no
 
 IPMITOOL_ENABLE = yes

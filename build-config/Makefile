@@ -1,6 +1,7 @@
 #-------------------------------------------------------------------------------
 #>
-#
+#  Copyright (C) 2021 Alex Doyle <adoyle@nvidia.com>
+#  Copyright (C) 2021 Andriy Dobush <andriyd@nvidia.com>
 #  Copyright (C) 2013,2014,2015,2016,2017 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2014,2015 Carlos Cardenas <carlos@cumulusnetworks.com>
 #  Copyright (C) 2014,2017 david_yang <david_yang@accton.com>
@@ -25,6 +26,8 @@
 # The build specification is in this directory.  The results of the
 # build process end up in ../build.  The dependencies follow a source,
 # patch, build, install sequence and use stamps to track targets.
+#
+# To see all make targets, type: make help-all
 #
 # When building multiple machines, common components are only built
 # once per toolchain.
@@ -354,12 +357,21 @@ ONIE_MIRROR	?= http://mirror.opencompute.org/onie
 
 # By default do not enable secure boot
 SECURE_BOOT_ENABLE ?= no
+
+# Secure boot extended enables ONIE password, so far
+SECURE_BOOT_EXT ?= no
+
+# If yes, enable the following for GRUB
+# - grub file verification with detached signatures
+# - grub password protection.
+SECURE_GRUB ?= no
+
 ifeq ($(SECURE_BOOT_ENABLE),yes)
+  SHIM_ENABLE = yes
   PESIGN_ENABLE = yes
   GNU_EFI_ENABLE = yes
   OPENSSL_ENABLE = yes
   MOKUTIL_ENABLE = yes
-  SHIM_ENABLE = yes
   KEYUTILS_ENABLE = yes
 endif
 
@@ -451,9 +463,7 @@ endif
 ifeq ($(MOKUTIL_ENABLE),yes)
   include make/mokutil.make
 endif
-ifeq ($(SHIM_ENABLE),yes)
-  include make/shim.make
-endif
+
 ifeq ($(KEYUTILS_ENABLE),yes)
   include make/keyutils.make
 endif
@@ -463,6 +473,53 @@ ifeq ($(IOACCESS_ENABLE),yes)
   include make/ioaccess.make
 endif
 
+ifeq ($(SECURE_BOOT_EXT),yes)
+# Secure Boot is a pre requisite for secure boot extended
+    SECURE_BOOT_ENABLE = yes
+endif
+
+ifeq ($(SECURE_BOOT_ENABLE),yes)
+# Makefile to handle signing keys and security
+  include make/signing-keys.make
+
+# Machine specific makefile that details:
+#  Key locations
+#  Security configuration details
+# This defaults to the machine's machine-security.make,
+#  but anither configuration can be specified, for
+# doing developer or release builds.
+#  include $(MACHINE_SECURITY_MAKEFILE)
+
+
+# If initrd verification included, check key variables
+# This uses gpg keys, which Secure Boot doesn't.
+  ifeq ($(SECURE_BOOT_EXT),yes)
+# Secure Boot is a pre requisite for secure grub
+    ifeq ($(SECURE_GRUB),yes)
+      GENERATE_KEYS_MSG = " check the $(MACHINE_SECURITY_MAKEFILE) file."
+# Validate GPG keys used by GRUB
+      ifeq ($(GPG_SIGN_PUBRING),)
+        $(error GPG_SIGN_PUBRING key location is not set. Disable SECURE_GRUB or $(GENERATE_KEYS_MSG))
+      endif
+      ifeq ($(GPG_SIGN_SECRING),)
+        $(error GPG_SIGN_SECRING key location is not set. Disable SECURE_GRUB or $(GENERATE_KEYS_MSG))
+      endif
+# Validate password for GRUB
+      ifeq ($(GRUB_PASSWD_PLAINTEXT),)
+        ifeq ($(GRUB_PASSWD_HASHED),)
+          $(error GRUB_PASSWD_PLAINTEXT or GRUB_PASSWD_HASHED are not set - $(GENERATE_KEYS_MSG))
+        endif
+      endif
+    endif
+  endif
+endif
+
+# Note that the Shim include must follow the machine-security.make
+#  as it has definitions that shim will use.
+ifeq ($(SHIM_ENABLE),yes)
+  include make/shim.make
+endif
+
 include make/images.make
 include make/demo.make
 
@@ -470,6 +527,13 @@ include make/demo.make
 FIRMWARE_UPDATE_ENABLE ?= no
 ifeq ($(FIRMWARE_UPDATE_ENABLE),yes)
   include make/firmware-update.make
+endif
+
+# Pre Debian 11 environments just had /usr/bin/python
+# Now the environment distinguishes between python2 and python3
+# If 'python' is not present, default to python2
+ifeq (, $(shell which python ))
+  export PYTHON=python2
 endif
 
 
@@ -536,6 +600,13 @@ machine-prefix:
 	$(Q) echo $(MACHINE_PREFIX)
 
 # Install required build packages for a x86_64 debian based build host
+# Note:  depending on your release of Debian, and the ONIE release
+# you need to build for, this may not be the best solution.
+# The ONIE FAQ: https://opencomputeproject.github.io/onie/faq/index.html
+# has information on how to use Docker containers to (re-)create a build
+# environment.
+# The onie/build-config/scripts/onie-build-targets.json file lists
+#  platforms and known working build environments.
 DEBIAN_BUILD_HOST_PACKAGES	= build-essential stgit u-boot-tools util-linux \
 				  gperf device-tree-compiler python-all-dev xorriso \
 				  autoconf automake bison flex texinfo libtool libtool-bin \
@@ -544,14 +615,32 @@ DEBIAN_BUILD_HOST_PACKAGES	= build-essential stgit u-boot-tools util-linux \
 				  libexpat1-dev fakeroot python-sphinx rst2pdf \
 				  libefivar-dev libnss3-tools libnss3-dev libpopt-dev \
 				  libssl-dev sbsigntool uuid-runtime uuid-dev cpio \
-				  bsdmainutils
+				  bsdmainutils unzip
 
 PHONY += debian-prepare-build-host
 debian-prepare-build-host:
 	$(Q) sudo apt-get update
 	$(Q) sudo apt-get install -y $(DEBIAN_BUILD_HOST_PACKAGES)
+	$(Q) echo "=== See the online ONIE documentation for building with Docker images. ==="
 
 PHONY += ldd
+
+# Cache already downloaded packges on the build system, so that they
+# may be copied in from the host system's /var/cache/onie/download
+# for a clean ONIE build rather than downloaded over the network.
+# Should the entire ONIE mirror be needed, download it to
+# /var/cache/onie/download with:
+#   wget –recursive –cut-dirs=2 –no-host-directories –no-parent –reject “index.html” http://mirror.opencompute.org/onie/
+PHONY += system-download-cache-update
+system-download-cache-update:
+	$(Q) echo "=== Adding packages from ../build/download to /var/cache/onie/download. ==="
+	$(Q) sudo mkdir -p   /var/cache/onie/download
+	$(Q) sudo chmod a+w  /var/cache/onie/download 
+	$(Q) cp -vr ../build/download/* /var/cache/onie/download
+# Trim download completion files.
+	$(Q) rm -f /var/cache/onie/download/*-download
+	$(Q) echo "=== Use ONIE_USE_SYSTEM_DOWNLOAD_CACHE=TRUE to access during build. ==="
+
 
 # Run the cross ldd for the target platform
 ifeq ($(word 1, $(MAKECMDGOALS)),ldd)
@@ -566,5 +655,18 @@ ldd:
 	$(Q) echo "Running cross-ldd on file: $(LDD_FILE)"
 	$(Q) echo "Using SYSROOT directory  : $(SYSROOT)"
 	$(Q) PATH='$(CROSSBIN):$(PATH)' $(CROSSBIN)/$(CROSSPREFIX)ldd --root $(SYSROOTDIR) $(LDD_FILE)
+
+PHONY += help-all
+
+# Print every possible make target, now that PHONY should be fully updated.
+help-all:
+	$(Q) sed -n -e "/^#>/,/^#</{s/^#[ <>]*//;s/\.PHONY *://;p}" $(THIS_MAKEFILE)
+	$(Q) echo ""
+	$(Q) echo "TARGETS"
+	$(Q) for I in $(sort $(PHONY)); do echo "    $$I"; done
+	$(Q) echo ""
+	$(Q) echo "Typical usage is to checkout a tree and type:"
+	$(Q) echo "  make MACHINEROOT=../machine/<vendor> MACHINE=<platform> all demo"
+	$(Q) echo ""
 
 .PHONY: $(PHONY)
