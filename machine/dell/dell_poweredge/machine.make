@@ -99,7 +99,7 @@ RECOVERY_DEFAULT_ENTRY = embed
 
 # Include additional files in the installer image.  This is useful to
 # share code between the ONIE run-time and the installer.
-UPDATER_IMAGE_PARTS_PLATFORM = $(MACHINEDIR)/rootconf/sysroot-lib-onie/test-install-sharing
+# UPDATER_IMAGE_PARTS_PLATFORM = $(MACHINEDIR)/rootconf/sysroot-lib-onie/test-install-sharing
 
 # Secure GRUB requires Secure Boot extensions
 ifeq ($(SECURE_GRUB),yes)
