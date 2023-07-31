@@ -1,5 +1,6 @@
 #-------------------------------------------------------------------------------
 #
+#  Copyright (C) 2020 Alex Doyle <adoyle@nvidia.com>
 #  Copyright (C) 2013,2014,2017 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2016 Pankaj Bansal <pankajbansal3073@gmail.com>
 #
@@ -10,15 +11,22 @@
 # This is a makefile fragment that defines the build of crosstool-NG
 #
 
-# Default GCC version to build for the toolchain
-GCC_VERSION 			?= 6.3.0
-XTOOLS_LIBC 			?= uClibc-ng
-XTOOLS_LIBC_VERSION 		?= 1.0.22
+# Default GCC version to build for the toolchain.
+#  Tip: Reference a Debian install for related component versions.
+#  To upgrade sha1 for new package:
+#     sha1sum ./gcc-8.3.0.tar.xz > ./upstream/gcc-8.3.0.tar.xz.sha1
+#     https://ftp.gnu.org/pub/gnu/gcc/gcc-8.3.0/gcc-8.3.0.tar.xz
+GCC_VERSION 			?= 8.3.0
 
+# https://uclibc-ng.org/
+XTOOLS_LIBC 			?= uClibc-ng
+XTOOLS_LIBC_VERSION 		?= 1.0.38
+
+# http://crosstool-ng.github.io/
 CROSSTOOL_NG_DESC		= crosstool-NG
-CROSSTOOL_NG_VERSION		= 1.23.0
-CROSSTOOL_NG_TARBALL		= crosstool-ng-$(CROSSTOOL_NG_VERSION).tar.gz
-CROSSTOOL_NG_URLS		+= $(ONIE_MIRROR) https://github.com/crosstool-ng/crosstool-ng/archive
+CROSSTOOL_NG_VERSION		= 1.24.0
+CROSSTOOL_NG_TARBALL		= crosstool-ng-$(CROSSTOOL_NG_VERSION).tar.xz
+CROSSTOOL_NG_URLS		+= $(ONIE_MIRROR) http://crosstool-ng.org/download/crosstool-ng
 CROSSTOOL_NG_BUILD_DIR		= $(BUILDDIR)/crosstool-ng
 CROSSTOOL_NG_STAMP_DIR		= $(CROSSTOOL_NG_BUILD_DIR)/stamp
 CROSSTOOL_NG_DIR		= $(CROSSTOOL_NG_BUILD_DIR)/crosstool-ng-$(CROSSTOOL_NG_VERSION)
@@ -45,7 +53,7 @@ export CROSSTOOL_NG_LOCAL_PATCHDIR
 
 PHONY += crosstool-ng crosstool-ng-download crosstool-ng-source crosstool-ng-patch \
 	 crosstool-ng-configure crosstool-ng-build crosstool-ng-clean \
-	 crosstool-ng-download-clean
+	 crosstool-ng-download-clean crosstool-ng-menuconfig
 
 crosstool-ng: $(CROSSTOOL_NG_STAMP)
 
@@ -94,6 +102,11 @@ $(CROSSTOOL_NG_BUILD_STAMP): $(CROSSTOOL_NG_CONFIGURE_STAMP)
 	$(Q) echo "====  Building crosstool-ng-$(CROSSTOOL_NG_VERSION) ===="
 	$(Q) $(MAKE) -C $(CROSSTOOL_NG_DIR) MAKELEVEL=0
 	$(Q) touch $@
+
+# To explore crosstool-ng options
+crosstool-ng-menuconfig:
+	$(Q) $(CROSSTOOL_NG_DIR)/ct-ng menuconfig
+
 
 DIST_CLEAN += crosstool-ng-clean
 crosstool-ng-clean:

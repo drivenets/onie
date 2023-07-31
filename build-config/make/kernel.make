@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 #
+#  Copyright (C) 2021 Alex Doyle <adoyle@nvidia.com>
+#  Copyright (C) 2021 Andriy Dobush <andriyd@nvidia.com>
 #  Copyright (C) 2013,2014,2015,2017 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2016 Pankaj Bansal <pankajbansal3073@gmail.com>
 #
@@ -34,7 +36,9 @@ KERNEL_STAMP		= $(KERNEL_SOURCE_STAMP) \
 KERNEL			= $(KERNEL_STAMP)
 
 KERNEL_VMLINUZ		= $(IMAGEDIR)/$(MACHINE_PREFIX).vmlinuz
+KERNEL_VMLINUZ_SIG  = $(KERNEL_VMLINUZ).sig
 UPDATER_VMLINUZ		= $(MBUILDDIR)/onie.vmlinuz
+UPDATER_VMLINUZ_SIG = $(UPDATER_VMLINUZ).sig
 
 PHONY += kernel kernel-source kernel-patch kernel-config
 PHONY += kernel-build kernel-install kernel-clean
@@ -81,11 +85,20 @@ $(KERNEL_PATCH_STAMP): $(KERNEL_SRCPATCHDIR)/* $(MACHINE_KERNEL_PATCHDIR)/* $(KE
 $(LINUXDIR)/.config : $(LINUX_CONFIG) $(KERNEL_PATCH_STAMP)
 	$(Q) echo "==== Copying $(LINUX_CONFIG) to $(LINUXDIR)/.config ===="
 	$(Q) cp -v $< $@
-	$(Q) cat $(MACHINE_KERNEL_PATCHDIR)/config >> $(LINUXDIR)/.config
+#	$(Q) cat $(MACHINE_KERNEL_PATCHDIR)/config >> $(LINUXDIR)/.config
+	$(Q) echo "==== Merging patches from $(MACHINE_KERNEL_PATCHDIR)/config to $(LINUXDIR)/.config ===="
+	$(Q) $(LINUXDIR)/scripts/kconfig/merge_config.sh -r -m -O  $(LINUXDIR) $(LINUXDIR)/.config $(MACHINE_KERNEL_PATCHDIR)/config
 
+
+# Interactive update. User selects options, or not
 kernel-old-config: $(LINUXDIR)/.config
 	$(Q) $(MAKE) -C $(LINUXDIR) ARCH=$(KERNEL_ARCH) oldconfig
 
+# Update kernel config - set all defaults, non-interactive
+kernel-old-defconfig: $(LINUXDIR)/.config
+	$(Q) $(MAKE) -C $(LINUXDIR) ARCH=$(KERNEL_ARCH) olddefconfig
+
+# User can browse for options
 kernel-config: $(LINUXDIR)/.config
 	$(Q) $(MAKE) -C $(LINUXDIR) ARCH=$(KERNEL_ARCH) menuconfig
 
@@ -104,7 +117,7 @@ $(KERNEL_BUILD_STAMP): $(KERNEL_SOURCE_STAMP) $(LINUX_NEW_FILES) $(LINUXDIR)/.co
 	    $(MAKE) -C $(LINUXDIR)		\
 		ARCH=$(KERNEL_ARCH)		\
 		CROSS_COMPILE=$(CROSSPREFIX)	\
-		MODULE_SIG_KEY_SRCPREFIX=$(MACHINEDIR)/x509/ \
+		MODULE_SIG_KEY_SRCPREFIX=$(ONIE_MODULE_SIG_KEY_SRCPREFIX)/ \
 		V=$(V) 				\
 		all
 	$(Q) touch $@
@@ -138,6 +151,12 @@ ifeq ($(SECURE_BOOT_ENABLE),yes)
 	$(Q) sbsign --key $(ONIE_VENDOR_SECRET_KEY_PEM) \
 		--cert $(ONIE_VENDOR_CERT_PEM) \
 		--output $(KERNEL_VMLINUZ) $(KERNEL_VMLINUZ).unsigned
+endif
+ifeq ($(SECURE_GRUB),yes)
+# Create detached gpg signatures for GRUB to validate files with.
+	$(Q) echo "==== GPG sign vmlinuz ===="
+	$(Q) fakeroot -- $(SCRIPTDIR)/gpg-sign.sh $(GPG_SIGN_SECRING) ${KERNEL_VMLINUZ}
+	$(Q) ln -sf $(KERNEL_VMLINUZ_SIG) $(UPDATER_VMLINUZ_SIG)
 endif
 	$(Q) ln -sf $(KERNEL_VMLINUZ) $(UPDATER_VMLINUZ)
 	$(Q) touch $@

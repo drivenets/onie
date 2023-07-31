@@ -1,0 +1,14 @@
+onie-sys-eeprom-platform.patch
+add-mbdetect-command-to-detect-main-board.patch
+mbdetect-bde-platform.patch
+onie-sys-eeprom-mux-enable.patch
+onie-sys-eeprom-write-protection.patch
+support-i2c-mux-driver-pca9641.patch
+Add-force-option-for-sys_eeprom.patch
+add-fn-8032-bn-f-platform.patch
+onie-syseeprom-support-ipmi.patch
+change-the-platform-name-in-multiple-platforms.patch
+enhance-mbdetect-command-to-generate-onieid-by-hardware.patch
+add-dm6209-7-platform-support.patch
+add-fn8656-bnf-platform.patch
+add-fn8032-bnf-r1-platform-support.patch

@@ -1,5 +1,6 @@
 #-------------------------------------------------------------------------------
 #
+#  Copyright (C) 2020 Alex Doyle <adoyle@nvidia.com>
 #  Copyright (C) 2013,2014,2015,2017 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2016 Pankaj Bansal <pankajbansal3073@gmail.com>
 #
@@ -39,12 +40,12 @@ XTOOLS_STAMP		= $(XTOOLS_PREP_STAMP) \
 export XTOOLS_INSTALL_DIR
 
 PHONY += xtools xtools-prep xtools-download xtools-config \
-	 xtools-build xtools-clean xtools-distclean
+	 xtools-build xtools-clean xtools-distclean uclibc-menuconfig
 
 # List of common packages needed by crosstool-NG
 CT_NG_COMPONENTS =	\
 	autoconf-2.69.tar.xz		\
-	automake-1.15.tar.xz		\
+	automake-1.15.1.tar.xz		\
 	duma_2_5_15.tar.gz		\
 	gettext-0.19.8.1.tar.xz		\
 	libelf-0.8.13.tar.gz		\
@@ -55,7 +56,19 @@ CT_NG_COMPONENTS =	\
 	make-4.2.1.tar.bz2		\
 	ncurses-6.0.tar.gz
 
-ifeq ($(GCC_VERSION),6.3.0)
+ifeq ($(GCC_VERSION),8.3.0)
+CT_NG_COMPONENTS +=	\
+	binutils-2.32.tar.bz2 \
+	expat-2.2.6.tar.bz2	    \
+	gcc-8.3.0.tar.xz		\
+	gdb-7.12.1.tar.xz       \
+	gmp-6.1.2.tar.xz		\
+	isl-0.20.tar.xz		\
+	mpc-1.1.0.tar.gz        \
+	mpfr-4.1.0.tar.xz		\
+	strace-4.26.tar.xz      \
+	zlib-1.2.11.tar.xz      
+else ifeq ($(GCC_VERSION),6.3.0)
 CT_NG_COMPONENTS +=	\
 	gcc-6.3.0.tar.bz2		\
 	binutils-2.28.tar.bz2		\
@@ -82,6 +95,7 @@ else
 endif
 
 ifeq ($(XTOOLS_LIBC),glibc)
+# https://ftp.gnu.org/gnu/glibc/glibc-2.34.tar.xz
   CT_NG_COMPONENTS += glibc-$(XTOOLS_LIBC_VERSION).tar.xz
 endif
 
@@ -105,9 +119,16 @@ $(XTOOLS_DOWNLOAD_STAMP): $(XTOOLS_PREP_STAMP) | $(KERNEL_DOWNLOAD_STAMP) $(UCLI
 		done
 	$(Q) touch $@
 
+#
+# Set CT_LINUX_VERSION and CT_LINUX_V_a_b=y in the new uClibc config.
+#
+CT_LINUX_V = $(subst .,_,$(LINUX_VERSION))
 $(XTOOLS_BUILD_DIR)/.config: $(XTOOLS_CONFIG) $(XTOOLS_PREP_STAMP)
 	$(Q) echo "==== Copying $(XTOOLS_CONFIG) to $@ ===="
-	$(Q) cp -v $< $@
+	$(Q) cp -v $< $(XTOOLS_BUILD_DIR)/.config
+	$(Q) echo "==== Setting kernel version to $(LINUX_VERSION).$(LINUX_MINOR_VERSION) in .config ===="
+	$(Q) sed -i 's/CT_LINUX_VERSION=.*"/CT_LINUX_VERSION="$(LINUX_VERSION).$(LINUX_MINOR_VERSION)"/g' $(XTOOLS_BUILD_DIR)/.config
+	$(Q) sed -i 's/CT_LINUX_V_$(CT_LINUX_V) is not set/CT_LINUX_V_$(CT_LINUX_V)=y/g' $(XTOOLS_BUILD_DIR)/.config
 
 xtools-config: $(XTOOLS_BUILD_DIR)/.config $(CROSSTOOL_NG_BUILD_STAMP)
 	$(Q) cd $(XTOOLS_BUILD_DIR) && $(CROSSTOOL_NG_DIR)/ct-ng menuconfig
@@ -121,7 +142,7 @@ xtools-download-only: $(XTOOLS_BUILD_DIR)/.config $(CROSSTOOL_NG_BUILD_STAMP)
 xtools-build: $(XTOOLS_BUILD_STAMP)
 $(XTOOLS_BUILD_STAMP): $(XTOOLS_BUILD_DIR)/.config $(XTOOLS_DOWNLOAD_STAMP) $(CROSSTOOL_NG_BUILD_STAMP)
 	$(Q) rm -f $@ && eval $(PROFILE_STAMP)
-	$(Q) echo "====  Building xtools for $(XTOOLS_VERSION) ===="
+	$(Q) echo "====  Building xtools for $(XTOOLS_VERSION) in $(XTOOLS_BUILD_DIR) ===="
 	$(Q) cd $(XTOOLS_BUILD_DIR) && \
 		$(CROSSTOOL_NG_DIR)/ct-ng build || (rm $(XTOOLS_BUILD_DIR)/.config.2 && false)
 	$(Q) touch $@
@@ -145,6 +166,20 @@ xtools-distclean:
 		echo " done ===" ; done
 	$(Q) rm -rf $(XTOOLS_ROOT)
 	$(Q) echo "=== Finished making $@ ==="
+
+
+# The config for uclibc is passed in for build.
+# However, if the uclibc configuration options are needed for
+#  upgrade or debug, the menuconfig can be run here.
+#  The new .config will need to be merged (or upgraded) 
+#  with the existing one to actually be applied, though.
+uclibc-menuconfig:
+# The rest of the path can be hardcodeed since only x86 uses uClibc
+	$(Q)  cd  $(XTOOLS_BUILD_DIR)/build/x86_64-onie-linux-uclibc/src/uClibc \
+			&& make menuconfig
+	$(Q)  echo "=== uClibc config file is here: ==="
+	$(Q)  echo "$(XTOOLS_BUILD_DIR)/build/x86_64-onie-linux-uclibc/src/uClibc"
+	$(Q)  ls -al $(XTOOLS_BUILD_DIR)/build/x86_64-onie-linux-uclibc/src/uClibc
 
 #-------------------------------------------------------------------------------
 #

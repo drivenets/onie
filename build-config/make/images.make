@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 #
+#  Copyright (C) 2020,2021 Alex Doyle <adoyle@nvidia.com>
+#  Copyright (C) 2021 Andriy Dobush <andriyd@nvidia.com>
 #  Copyright (C) 2013,2014,2015,2016,2017 Curt Brune <curt@cumulusnetworks.com>
 #  Copyright (C) 2014,2015,2016,2017 david_yang <david_yang@accton.com>
 #  Copyright (C) 2014 Stephen Su <sustephen@juniper.net>
@@ -17,10 +19,12 @@
 ROOTCONFDIR		= $(CONFDIR)
 SYSROOT_CPIO		= $(MBUILDDIR)/sysroot.cpio
 SYSROOT_CPIO_XZ		= $(IMAGEDIR)/$(MACHINE_PREFIX).initrd
+SYSROOT_CPIO_XZ_SIG = $(SYSROOT_CPIO_XZ).sig
 ITB_IMAGE		= $(IMAGEDIR)/$(MACHINE_PREFIX).itb
 
 UPDATER_ITB		= $(MBUILDDIR)/onie.itb
 UPDATER_INITRD		= $(MBUILDDIR)/onie.initrd
+UPDATER_INITRD_SIG  = $(MBUILDDIR)/onie.initrd.sig
 UPDATER_ONIE_TOOLS	= $(MBUILDDIR)/onie-tools.tar.xz
 
 UPDATER_IMAGE		= $(IMAGEDIR)/onie-updater-$(ARCH)-$(MACHINE_PREFIX)
@@ -118,6 +122,10 @@ ifeq ($(KEYUTILS_ENABLE),yes)
   PACKAGES_INSTALL_STAMPS += $(KEYUTILS_INSTALL_STAMP)
 endif
 
+ifeq ($(SECURE_GRUB),no)
+  GPG_SIGN_SECRING = ''
+endif
+
 ifndef MAKE_CLEAN
 SYSROOT_NEW_FILES = $(shell \
 			test -d $(ROOTCONFDIR)/default && \
@@ -176,7 +184,10 @@ SYSROOT_LIBS	= ld-$(XTOOLS_LIBC_VERSION).so \
 		  libutil.so.1 libutil-$(XTOOLS_LIBC_VERSION).so \
 		  libdl.so.2 libdl-$(XTOOLS_LIBC_VERSION).so \
 		  libpthread.so.0 libpthread-$(XTOOLS_LIBC_VERSION).so \
-		  librt.so.1 librt-$(XTOOLS_LIBC_VERSION).so
+		  librt.so.1 librt-$(XTOOLS_LIBC_VERSION).so \
+		  libnss_dns.so.2 libnss_dns-$(XTOOLS_LIBC_VERSION).so \
+		  libresolv.so.2 libresolv-$(XTOOLS_LIBC_VERSION).so  \
+		  libnss_files.so.2 libnss_files-$(XTOOLS_LIBC_VERSION).so
   ifeq ($(ARCH),arm64)
     SYSROOT_LIBS	+= ld-linux-aarch64.so.1
   endif
@@ -188,6 +199,8 @@ ifeq ($(REQUIRE_CXX_LIBS),yes)
     SYSROOT_LIBS += libstdc++.so.6.0.22
   else ifeq ($(GCC_VERSION),4.9.2)
     SYSROOT_LIBS += libstdc++.so.6.0.20
+  else ifeq ($(GCC_VERSION),8.3.0)
+    SYSROOT_LIBS += libstdc++.so.6.0.25
   else
     $(error C++ support: Unsupported GCC version: $(GCC_VERSION))
   endif
@@ -220,7 +233,7 @@ $(SYSROOT_CHECK_STAMP): $(PACKAGES_INSTALL_STAMPS)
 			find $(DEV_SYSROOT)/lib64 $(DEV_SYSROOT)/lib -name $$file | xargs -i cp -av {} $(SYSROOTDIR)/lib/ || exit 1 ; \
 		else \
 		    [ -r "$(DEV_SYSROOT)/lib/$$file" ] || { \
-			    echo "ERROR: Missing SYSROOT_LIB: $$file" ; \
+			    echo "ERROR: Missing SYSROOT_LIB: $$file under $(DEV_SYSROOT)/lib" ; \
 			    exit 1; } ; \
 			find $(DEV_SYSROOT)/lib -name $$file | xargs -i cp -av {} $(SYSROOTDIR)/lib/ || exit 1 ; \
 		fi; \
@@ -272,6 +285,22 @@ $(SYSROOT_COMPLETE_STAMP): $(SYSROOT_CHECK_STAMP)
 		cp -a $(MACHINEDIR)/rootconf/sysroot-rcK/* $(SYSROOTDIR)/etc/rc0.d ; \
 		cp -a $(MACHINEDIR)/rootconf/sysroot-rcK/* $(SYSROOTDIR)/etc/rc6.d ; \
 	     fi
+	$(Q) if [ -d $(MACHINEDIR)/rootconf/sysroot-etc ] ; then \
+		cp -ar $(MACHINEDIR)/rootconf/sysroot-etc/* $(SYSROOTDIR)/etc/ ; \
+	     fi
+ifeq ($(SECURE_BOOT_EXT),yes)
+# Allow passwords to be disabled if Secure Boot is off.
+# Copy the console open that uses /bin/sh as onie-console-open
+	$(Q) cp $(SYSROOTDIR)/bin/onie-console $(SYSROOTDIR)/bin/onie-console-open
+# Dynamically create a secured console version that uses login instead of /bin/sh
+	$(Q) sed -i 's/exec \/bin\/sh -l/exec \/bin\/login/' $(SYSROOTDIR)/bin/onie-console
+# Save a copy of the secured.
+	$(Q) cp $(SYSROOTDIR)/bin/onie-console $(SYSROOTDIR)/bin/onie-console-secure
+# Apply machine specific ONIE password file
+	$(Q) if [ -e $(MACHINEDIR)/rootconf/sysroot-etc/passwd-secured ] ; then \
+                cp -a $(MACHINEDIR)/rootconf/sysroot-etc/passwd-secured $(SYSROOTDIR)/etc/passwd ; \
+             fi
+endif
 	$(Q) cd $(SYSROOTDIR) && ln -fs sbin/init ./init
 	$(Q) rm -f $(LSB_RELEASE_FILE)
 	$(Q) echo "DISTRIB_ID=onie" >> $(LSB_RELEASE_FILE)
@@ -300,6 +329,12 @@ ifeq ($(UEFI_ENABLE),yes)
 	$(Q) echo "onie_uefi_boot_loader=$(UEFI_BOOT_LOADER)" >> $(MACHINE_CONF)
 	$(Q) echo "onie_uefi_arch=$(EFI_ARCH)" >> $(MACHINE_CONF)
 endif
+ifeq ($(SECURE_BOOT_EXT),yes)
+	$(Q) echo "onie_secure_boot_ext=$(SECURE_BOOT_EXT)" >> $(MACHINE_CONF)
+endif
+ifeq ($(SECURE_GRUB),yes)
+	$(Q) echo "onie_secure_grub=$(SECURE_GRUB)" >> $(MACHINE_CONF)
+endif
 ifeq ($(SECURE_BOOT_ENABLE),yes)
 	$(Q) echo "onie_secure_boot=$(SECURE_BOOT_ENABLE)" >> $(MACHINE_CONF)
 endif
@@ -313,9 +348,17 @@ $(SYSROOT_CPIO_XZ) : $(SYSROOT_COMPLETE_STAMP)
 	$(Q) echo "==== Create xz compressed sysroot for bootstrap ===="
 	$(Q) fakeroot -- $(SCRIPTDIR)/make-sysroot.sh $(SYSROOTDIR) $(SYSROOT_CPIO)
 	$(Q) xz --compress --force --check=crc32 --stdout -8 $(SYSROOT_CPIO) > $@
+ifeq ($(SECURE_GRUB),yes)
+	# Create a detached signature so that grub can verify it
+	$(Q) echo "==== GPG sign file $(SYSROOT_CPIO_XZ) ===="
+	$(Q) fakeroot -- $(SCRIPTDIR)/gpg-sign.sh $(GPG_SIGN_SECRING) $(SYSROOT_CPIO_XZ)
+endif
 
 $(UPDATER_INITRD) : $(SYSROOT_CPIO_XZ)
 	ln -sf $< $@
+ifeq ($(SECURE_GRUB),yes)
+	ln -sf $(SYSROOT_CPIO_XZ_SIG) $(UPDATER_INITRD_SIG)
+endif
 
 ifndef MAKE_CLEAN
 ONIE_TOOLS_FILES = $(shell \
@@ -375,6 +418,8 @@ $(IMAGE_UPDATER_STAMP): $(UPDATER_IMAGE_PARTS_COMPLETE) $(UPDATER_IMAGE_PARTS_PL
 	     EXTRA_CMDLINE_LINUX="$(EXTRA_CMDLINE_LINUX)" \
 	     SERIAL_CONSOLE_ENABLE=$(SERIAL_CONSOLE_ENABLE) \
 	     UEFI_BOOT_LOADER=$(UEFI_BOOT_LOADER) \
+	     GPG_SIGN_SECRING=$(GPG_SIGN_SECRING) \
+	     SECURE_GRUB=$(SECURE_GRUB) \
 	     fakeroot -- $(SCRIPTDIR)/onie-mk-installer.sh onie $(ROOTFS_ARCH) $(MACHINEDIR) \
 		$(MACHINE_CONF) $(INSTALLER_DIR) \
 		$(UPDATER_IMAGE) $(UPDATER_IMAGE_PARTS) $(UPDATER_IMAGE_PARTS_PLATFORM)
