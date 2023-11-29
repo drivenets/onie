@@ -76,7 +76,7 @@ SECURE_GRUB = yes
 
 # Define the makefile with security settings, to
 # provide the option of using another file with different settings.
-MACHINE_SECURITY_MAKEFILE ?= $(MACHINEDIR)/machine-security.make
+# MACHINE_SECURITY_MAKEFILE ?= $(MACHINEDIR)/machine-security.make
 
 # Console parameters can be defined here (default values are in
 # build-config/arch/x86_64.make).
@@ -95,11 +95,25 @@ MACHINE_SECURITY_MAKEFILE ?= $(MACHINEDIR)/machine-security.make
 # Specify the default menu option when booting a recovery image.  Valid
 # values are "rescue" or "embed" (without double-quotes). This
 # parameter defaults to "rescue" mode if not specified here.
-# RECOVERY_DEFAULT_ENTRY = embed
+RECOVERY_DEFAULT_ENTRY = embed
 
 # Include additional files in the installer image.  This is useful to
 # share code between the ONIE run-time and the installer.
-UPDATER_IMAGE_PARTS_PLATFORM = $(MACHINEDIR)/rootconf/sysroot-lib-onie/test-install-sharing
+# UPDATER_IMAGE_PARTS_PLATFORM = $(MACHINEDIR)/rootconf/sysroot-lib-onie/test-install-sharing
+
+# Secure GRUB requires Secure Boot extensions
+ifeq ($(SECURE_GRUB),yes)
+	SECURE_BOOT_EXT = yes
+endif
+
+# Secure boot extended requires secure boot to be active.
+# This will enable onie/grub passwords, detached signatures, etc
+ifeq ($(SECURE_BOOT_EXT),yes)
+	SECURE_BOOT_ENABLE = yes
+endif
+
+
+
 
 # Secure GRUB requires Secure Boot extensions
 ifeq ($(SECURE_GRUB),yes)
@@ -120,3 +134,10 @@ endif
 # Local Variables:
 # mode: makefile-gmake
 # End:
+
+OPENSSL_ENABLE = yes
+
+SECURE_BOOT_ENABLE = no
+SECURE_BOOT_EXT = no
+SECURE_GRUB = no
+

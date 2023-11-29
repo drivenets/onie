@@ -62,6 +62,10 @@ ifeq ($(GPT_ENABLE),yes)
   PACKAGES_INSTALL_STAMPS += $(GPTFDISK_INSTALL_STAMP)
 endif
 
+ifeq ($(CURL_ENABLE),yes)
+  PACKAGES_INSTALL_STAMPS += $(CURL_INSTALL_STAMP)
+endif
+
 ifeq ($(PARTED_ENABLE),yes)
   PACKAGES_INSTALL_STAMPS += $(PARTED_INSTALL_STAMP)
 endif
@@ -96,6 +100,11 @@ endif
 
 ifeq ($(IPMITOOL_ENABLE),yes)
   PACKAGES_INSTALL_STAMPS += $(IPMITOOL_INSTALL_STAMP)
+endif
+
+#Jay(v09): Integrate ioget/ioset tools in Apollo ONIE
+ifeq ($(IOACCESS_ENABLE),yes)
+  PACKAGES_INSTALL_STAMPS += $(IOACCESS_INSTALL_STAMP)
 endif
 
 ifeq ($(EXT3_4_ENABLE),yes)

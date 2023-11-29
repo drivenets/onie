@@ -128,6 +128,9 @@ PATCHDIR     = $(realpath ../patches)
 UPSTREAMDIR  = $(realpath ../upstream)
 CONFDIR	     = $(realpath ../rootconf)
 SCRIPTDIR    = $(realpath ./scripts)
+##### Jay(v09): Add variable for fw-upgrade-tools >>
+UFITOOLDIR   = $(realpath ../fw-upgrade-tools)
+##### Jay(v09): Add variable for fw-upgrade-tools <<
 
 #-------------------------------------------------------------------------------
 #
@@ -198,7 +201,11 @@ KNOWN_ASIC_VENDORS = \
   mvl    \
   nephos \
   none   \
-  qemu
+  barefoot \
+  qemu   \
+  hp     \
+  dell   \
+  cisco
 
 ifneq (,$(MAKECMDGOALS))
   ifeq (,$(filter onie-release-tag help distclean %build-host, $(MAKECMDGOALS)))
@@ -307,9 +314,12 @@ ifeq ($(ONIE_RELEASE_TAG),)
     ONIE_RELEASE_TAG = $(GIT_BRANCH)-$(BUILD_DATE)
   endif
 endif
-DIRTY  = $(shell cd $(MACHINEDIR) && git status | \
-		egrep -q '(Your branch is ahead|modified:|Untracked files:)' && echo -dirty)
-LSB_RELEASE_TAG := $(ONIE_RELEASE_TAG)$(VENDOR_VERSION)$(DIRTY)
+
+# Jim adds: do not show dirty token
+#LSB_RELEASE_TAG := $(ONIE_RELEASE_TAG)$(VENDOR_VERSION)$(DIRTY)
+#DIRTY  = $(shell cd $(MACHINEDIR) && git status | \
+#		egrep -q '(Your branch is ahead|modified:|Untracked files:)' && echo -dirty)
+LSB_RELEASE_TAG := $(ONIE_RELEASE_TAG)$(VENDOR_VERSION)
 export LSB_RELEASE_TAG
 
 #-------------------------------------------------------------------------------
@@ -397,6 +407,9 @@ ifeq ($(GPT_ENABLE),yes)
   include make/popt.make
   include make/gptfdisk.make
 endif
+ifeq ($(CURL_ENABLE),yes)
+  include make/curl.make
+endif
 ifeq ($(LVM2_ENABLE),yes)
   include make/lvm2.make
 endif
@@ -455,6 +468,11 @@ ifeq ($(KEYUTILS_ENABLE),yes)
   include make/keyutils.make
 endif
 
+#Jay(v09): Integrate ioget/ioset tools in Apollo ONIE
+ifeq ($(IOACCESS_ENABLE),yes)
+  include make/ioaccess.make
+endif
+
 ifeq ($(SECURE_BOOT_EXT),yes)
 # Secure Boot is a pre requisite for secure boot extended
     SECURE_BOOT_ENABLE = yes
@@ -470,7 +488,7 @@ ifeq ($(SECURE_BOOT_ENABLE),yes)
 # This defaults to the machine's machine-security.make,
 #  but anither configuration can be specified, for
 # doing developer or release builds.
-  include $(MACHINE_SECURITY_MAKEFILE)
+#  include $(MACHINE_SECURITY_MAKEFILE)
 
 
 # If initrd verification included, check key variables
