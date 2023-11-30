@@ -1,0 +1,34 @@
+===============================================================
+Installing ONIE on EC2 x86_64 Virtual Machine (copied from KVM)
+===============================================================
+
+Cross-Compiling ONIE
+====================
+
+Change directories to ``build-config`` to compile ONIE.
+
+To compile ONIE first change directories to ``build-config`` and then
+type ``"make MACHINE=ec2 all"``.  For example::
+
+  $ cd build-config
+  $ make -j4 MACHINE=ec2 all recovery-iso
+
+When complete, the ONIE binaries are located in
+``build/images``::
+
+-rw-r--r-- 1 dn dn 11925880 Dec 18 18:45 ec2-r0.initrd
+-rw-r--r-- 1 dn dn  4969120 Dec 18 18:30 ec2-r0.vmlinuz
+-rw-r--r-- 1 dn dn 37486592 Dec 18 18:50 onie-recovery-x86_64-ec2-r0.iso
+-rw-r--r-- 1 dn dn 16836602 Dec 18 18:45 onie-updater-x86_64-ec2-r0
+
+ec2-r0.vmlinuz -- This is the ONIE kernel image
+
+ec2-r0.initrd  -- This is the ONIE initramfs (filesystem)
+
+onie-updater-x86_64-ec2-r0 -- This is the ONIE self-update
+image.  This image is a self-extracting archive used for installing
+ONIE.
+
+onie-recovery-x86_64-ec2-r0.iso -- This is a recovery ISO image
+that can be installed as a CDROM image.
+
