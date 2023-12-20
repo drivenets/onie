@@ -198,7 +198,8 @@ KNOWN_ASIC_VENDORS = \
   mvl    \
   nephos \
   none   \
-  qemu
+  qemu   \
+  hp
 
 ifneq (,$(MAKECMDGOALS))
   ifeq (,$(filter onie-release-tag help distclean %build-host, $(MAKECMDGOALS)))
@@ -360,10 +361,10 @@ ifeq ($(SECURE_BOOT_ENABLE),yes)
   SHIM_ENABLE = yes
   PESIGN_ENABLE = yes
   GNU_EFI_ENABLE = yes
-  OPENSSL_ENABLE = yes
   MOKUTIL_ENABLE = yes
   KEYUTILS_ENABLE = yes
 endif
+OPENSSL_ENABLE = yes
 
 include make/kernel-download.make
 ifeq ($(XTOOLS_ENABLE),yes)
@@ -396,6 +397,9 @@ endif
 ifeq ($(GPT_ENABLE),yes)
   include make/popt.make
   include make/gptfdisk.make
+endif
+ifeq ($(CURL_ENABLE),yes)
+  include make/curl.make
 endif
 ifeq ($(LVM2_ENABLE),yes)
   include make/lvm2.make

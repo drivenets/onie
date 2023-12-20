@@ -64,15 +64,18 @@ SKIP_ETHMGMT_MACS = yes
 #  that this provides.
 # The kernel/config-insecure file is provided as
 #  an example.
-SECURE_BOOT_ENABLE = yes
+#SECURE_BOOT_ENABLE = yes
+SECURE_BOOT_ENABLE = no
 
 # Enable extended secure boot:
 #  Activates - ONIE password
-SECURE_BOOT_EXT = yes
+#SECURE_BOOT_EXT = yes
+SECURE_BOOT_EXT = no
 
 # Enable GRUB verification of files and passwords
 # Requires secure boot
-SECURE_GRUB = yes
+#SECURE_GRUB = yes
+SECURE_GRUB = no
 
 # Define the makefile with security settings, to
 # provide the option of using another file with different settings.
@@ -96,6 +99,7 @@ MACHINE_SECURITY_MAKEFILE ?= $(MACHINEDIR)/machine-security.make
 # values are "rescue" or "embed" (without double-quotes). This
 # parameter defaults to "rescue" mode if not specified here.
 # RECOVERY_DEFAULT_ENTRY = embed
+RECOVERY_DEFAULT_ENTRY = embed
 
 # Include additional files in the installer image.  This is useful to
 # share code between the ONIE run-time and the installer.

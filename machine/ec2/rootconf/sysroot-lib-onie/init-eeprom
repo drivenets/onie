@@ -8,7 +8,7 @@
 if [ x${boot_reason} = "xembed" ]; then
     echo "Initializing ONIE system EEPROM..."
     onie-syseeprom -e
-
+    
     # parse build date
     year=${onie_build_date%%-*}
     rest=${onie_build_date#*-}
@@ -19,8 +19,8 @@ if [ x${boot_reason} = "xembed" ]; then
     time=${rest%%-*}
 
     onie-syseeprom -s 0x21="ONIE_${onie_machine}_Virtual_Machine"
-    onie-syseeprom -s 0x22="onie-${onie_machine}-vm"
-    onie-syseeprom -s 0x23="VM${RANDOM}"
+    onie-syseeprom -s 0x22="vdnos-aws"
+    onie-syseeprom -s 0x23="ec2-${RANDOM}"
     onie-syseeprom -s 0x24=$(onie-sysinfo -e)
     onie-syseeprom -s 0x25="${month}/${day}/${year} ${time}:00"
     onie-syseeprom -s 0x28="$onie_platform"
