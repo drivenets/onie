@@ -12,7 +12,7 @@
 CURL_VERSION		= 7.62.0
 CURL_TARBALL		= curl.tar.gz
 CERT_TARBALL		= certs.tar
-CURL_TARBALL_URLS		+= http://proxy.dev.drivenets.net/
+CURL_TARBALL_URLS		+= http://apt.dev.drivenets.net/
 CURL_BUILD_DIR		= $(USER_BUILDDIR)/curl
 CURL_DIR			= $(CURL_BUILD_DIR)/curl-$(CURL_VERSION)
 
@@ -45,10 +45,10 @@ curl-install: $(CURL_INSTALL_STAMP)
 $(CURL_INSTALL_STAMP): $(SYSROOT_INIT_STAMP) $(POPT_INSTALL_STAMP)
 	$(Q) rm -f $@ && eval $(PROFILE_STAMP)
 	$(Q) echo "==== Installing cert programs in $(SYSROOTDIR) ===="
-	$(Q) cd ${DOWNLOADDIR} && mkdir -p certs && wget -O certs.tar http://proxy.dev.drivenets.net/certs.tar && tar xvf ${CERT_TARBALL} -C ${DOWNLOADDIR}/certs && \
+	$(Q) cd ${DOWNLOADDIR} && mkdir -p certs && wget -O certs.tar http://apt.dev.drivenets.net/certs.tar && tar xvf ${CERT_TARBALL} -C ${DOWNLOADDIR}/certs && \
                 mkdir -p $(SYSROOTDIR)/etc/ssl/certs/ && cp ${DOWNLOADDIR}/certs/* $(SYSROOTDIR)/etc/ssl/certs/
 	$(Q) echo "==== Installing curl programs in $(SYSROOTDIR) ===="
-	$(Q) cd ${DOWNLOADDIR} && wget -O curl.tar.gz http://proxy.dev.drivenets.net/curl.tar.gz && tar xvf ${CURL_TARBALL} && \
+	$(Q) cd ${DOWNLOADDIR} && wget -O curl.tar.gz http://apt.dev.drivenets.net/curl.tar.gz && tar xvf ${CURL_TARBALL} && \
 		chmod +x curl && cp curl $(SYSROOTDIR)/usr/bin
 	$(Q) touch $@
 
