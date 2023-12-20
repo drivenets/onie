@@ -116,8 +116,6 @@ ifeq ($(SECURE_BOOT_EXT),yes)
 endif
 
 
-
-
 # Secure GRUB requires Secure Boot extensions
 ifeq ($(SECURE_GRUB),yes)
 	SECURE_BOOT_EXT = yes
@@ -130,8 +128,6 @@ ifeq ($(SECURE_BOOT_EXT),yes)
 endif
 
 
-
-
 #-------------------------------------------------------------------------------
 #
 # Local Variables:
@@ -139,4 +135,3 @@ endif
 # End:
 
 OPENSSL_ENABLE = yes
-

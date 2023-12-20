@@ -7,8 +7,8 @@
 
 if [ x${boot_reason} = "xembed" ]; then
     echo "Initializing ONIE system EEPROM..."
-#    onie-syseeprom -e
-
+    onie-syseeprom -e
+    
     # parse build date
     year=${onie_build_date%%-*}
     rest=${onie_build_date#*-}
