@@ -9,11 +9,15 @@
 
 ONIE_ARCH ?= x86_64
 
-VENDOR_REV ?= 0
+# SW-176662: Change in the installation URL pointed @installer/grub-arch/grub/grub-common.cfg
+# v19.3 BOS will be installed instead of outdated bionic
+VENDOR_REV ?= 1
 
 # Translate hardware revision to ONIE hardware revision
 ifeq ($(VENDOR_REV),0)
   MACHINE_REV = 0
+else ifeq ($(VENDOR_REV),1)
+  MACHINE_REV = 1
 else
   $(warning Unknown VENDOR_REV '$(VENDOR_REV)' for MACHINE '$(MACHINE)')
   $(error Unknown VENDOR_REV)
